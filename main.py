@@ -1,4 +1,11 @@
 import pathlib
+import shutil
+
+
+# run these function below to allow permission for your 
+# program to execute in file or directory if necessary
+from permission import allow_permission_for_directory, allow_permission_for_file
+
 
 
 class My_file_manager:
@@ -45,10 +52,16 @@ class My_file_manager:
         while j < len(self.file_and_folder_name):
             dup_counter = 1
             while f"({dup_counter})" in self.file_and_folder_name[j].name:
-                if self.file_and_folder_name[j].is_file:
+                # This try exception is like a if and else statement
+                # if the path is a file it will throw a permission error
+                # using shutil we delete the directory to delete the directory 
+                # even if it's not empty
+                
+                try:
+                    # missing_ok help us to pass error if the file isn't there
                     self.file_and_folder_name[j].unlink(missing_ok=True)
-                else:
-                    self.file_and_folder_name[j].rmdir()
+                except PermissionError:
+                    shutil.rmtree(self.file_and_folder_name[j])
                 dup_counter+=1
                 j+=1
             j+=1
@@ -56,7 +69,7 @@ class My_file_manager:
     def delete_particular_zip(self, file_name):
         for path in self.file_zip:
             if path.name == file_name:
-                print(path)            
-        
-manager = My_file_manager(path_to_directory='/Users/adama/Downloads/')
-manager.find_duplicated_file_and_delete()
+                path.unlink(missing_ok=False)        
+    def delete_all_zip(self):
+        for path in self.file_zip:
+            path.unlink(missing_ok=True)    
